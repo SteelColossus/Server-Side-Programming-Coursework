@@ -1,3 +1,5 @@
+<link rel="stylesheet" type="text/css" href="style.css">
+
 <?php
 require_once 'MDB2.php';
 
@@ -30,5 +32,6 @@ if(PEAR::isError($res))
     die($res->getMessage());
 }
 
+echo "<b>JSON encoding:&nbsp;</b>";
 echo json_encode($res->fetchAll());
 ?>

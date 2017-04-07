@@ -1,0 +1,23 @@
+body {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	background-color: bisque;
+}
+.center {
+	text-align:center;
+}
+body,td,th {
+	color: brown; 
+}
+.larger {
+	font-size:larger;
+	text-align:right;
+}
+table {
+	margin-left:auto;
+	margin-right:auto;
+}
+.fixed {
+	font-family: Courier, monospace;
+	white-space: pre;
+	background-color:cornsilk;
+}

@@ -1,3 +1,5 @@
+<link rel="stylesheet" type="text/css" href="style.css">
+
 <?php
 require_once 'MDB2.php';
 
@@ -30,7 +32,7 @@ if(PEAR::isError($res))
 if ($res->numRows() > 0)
 {
 	echo "<table border=\"1\">";
-	echo "<tr style='font-weight: bold;'><td>Name</td><td>Gender</td><td>BMI</td></tr>";
+	echo "<tr><th>Name</th><th>Gender</th><th>BMI</th></tr>";
 
 	while ($row = $res->fetchRow())
 	{
