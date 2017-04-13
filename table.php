@@ -47,13 +47,32 @@ if(PEAR::isError($db))
     die($db->getMessage());
 }
 
-$country1 = $_REQUEST['country1'];
-$country2 = $_REQUEST['country2'];
+$country1 = (isset($_REQUEST['country1']) ? $_REQUEST['country1'] : null);
+$country2 = (isset($_REQUEST['country2']) ? $_REQUEST['country2'] : null);
+$country3 = (isset($_REQUEST['country3']) ? $_REQUEST['country3'] : null);
+$country4 = (isset($_REQUEST['country4']) ? $_REQUEST['country4'] : null);
+
+$countries = array();
+
+if ($country1 != null) $countries['country1'] = $country1;
+if ($country2 != null) $countries['country2'] = $country2;
+if ($country3 != null) $countries['country3'] = $country3;
+if ($country4 != null) $countries['country4'] = $country4;
 
 $column_names = array("country_name", "gold", "silver", "bronze", "total", "population", "gdp");
 
 $sql_base = "SELECT " . implode(", ", $column_names) . " FROM Country WHERE ISO_id LIKE";
-$sql_full = "$sql_base '$country1' UNION $sql_base '$country2'";
+$sql_full = "";
+
+$i = 0;
+
+foreach ($countries as $c)
+{	
+	$sql_full .= ($sql_base . " \"");
+	$sql_full .= $c;
+	$sql_full .= "\"";
+	if (++$i < count($countries)) $sql_full .= " UNION ";
+}
 
 $res = &$db->query($sql_full);
 
@@ -147,8 +166,26 @@ if ($res->numRows() > 1)
 	echo "<br>";
 
 	$sql_base = "SELECT Cyclist.iso_id, Cyclist.name, Country.country_name FROM Cyclist INNER JOIN Country ON Cyclist.ISO_id = Country.ISO_id WHERE Cyclist.ISO_id LIKE ";
-	$sql_full = "$sql_base '$country1' UNION $sql_base '$country2' ORDER BY iso_id, name";
+	$sql_full = "";
 
+	$i = 0;
+
+	foreach ($countries as $c)
+	{	
+		$sql_full .= ($sql_base . " \"");
+		$sql_full .= $c;
+		$sql_full .= "\"";
+		
+		if (++$i < count($countries))
+		{
+			$sql_full .= " UNION ";
+		}
+		else
+		{
+			$sql_full .= " ORDER BY iso_id, name";
+		}
+	}
+	
 	$res = &$db->query($sql_full);
 
 	if(PEAR::isError($res))
