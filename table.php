@@ -13,7 +13,7 @@ $db = &MDB2::connect($dsn);
 $db->setFetchMode(MDB2_FETCHMODE_ASSOC);
 
 if(PEAR::isError($db))
-{ 
+{
     die($db->getMessage());
 }
 
@@ -55,7 +55,7 @@ if ($res->numRows() > 1)
 {
 	$compdata = &$res->fetchAll();
 	
-	$sql_base = "SELECT Cyclist.iso_id, Cyclist.name, Country.country_name FROM Cyclist INNER JOIN Country ON Cyclist.ISO_id = Country.ISO_id WHERE Cyclist.ISO_id LIKE ";
+	$sql_base = "SELECT Country.ISO_id, Cyclist.name, Country.country_name FROM Cyclist INNER JOIN Country ON Cyclist.ISO_id = Country.ISO_id WHERE Cyclist.ISO_id LIKE";
 	$sql_full = "";
 
 	$i = 0;
@@ -72,7 +72,8 @@ if ($res->numRows() > 1)
 		}
 		else
 		{
-			$sql_full .= " ORDER BY iso_id, name";
+			$sql_full = "SELECT name, country_name FROM (" . $sql_full;
+			$sql_full .= " ORDER BY ISO_id, name) results";
 		}
 	}
 	

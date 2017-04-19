@@ -4,15 +4,9 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="robots" content="noindex, nofollow" />
 <link rel="stylesheet" type="text/css" href="style.css">
-<style type="text/css">
-.resultscell {
-	text-align: center;
-	width: 120px;
-}
-</style>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script>
-var numValid = 0;
+var displayedData = {};
 
 function getCookie(cname)
 {
@@ -97,7 +91,7 @@ function updateColumnVisibility()
 
 function updateResults()
 {
-	updateColumnVisibility()
+	updateColumnVisibility();
 	
 	var c1 = $("#country1").val();
 	var c2 = $("#country2").val();
@@ -126,13 +120,14 @@ function updateResults()
 		data.country4 = c4;
 	}
 	
-	var currentNumValid = Object.keys(data).length;
+	var numValid = Object.keys(data).length;
 	
-	if (currentNumValid >= 2 && numValid != currentNumValid)
-	{
-		numValid = currentNumValid;
+	if (numValid >= 2 && displayedData != data)
+	{		
+		displayedData = data;
 		
 		$.get("table.php", data, function(json) {
+			console.log("JSON result recieved: ");
 			console.log(json);
 			updateComparisonTable(json['countries']);
 			updateCyclistsTable(json['cyclists']);
@@ -278,7 +273,8 @@ function updateComparisonTable(json)
 			if (prop == "gdp") text = "$" + text;
 			$(newCell).html(text);
 			
-			$(newCell).addClass("resultscell");
+			$(newCell).addClass("fixedwidth");
+			$(newCell).addClass("center");
 			if (prop == "total") $(newCell).css("font-weight", "bold");
 			if (r == highestIndexes[prop]) $(newCell).css("background-color", "#0fff00");
 			$(rows[c]).append(newCell);
@@ -301,7 +297,7 @@ function updateCyclistsTable(json)
 	{
 		var cyclist = json[r];
 		
-		if (prevID == "" || prevID != cyclist['iso_id'])
+		if (prevID == "" || prevID != cyclist['country_name'])
 		{
 			currentRow = $("<tr>");
 			$(table).append(currentRow);
@@ -310,7 +306,7 @@ function updateCyclistsTable(json)
 			$(titleCell).html(cyclist['country_name']);
 			$(currentRow).append(titleCell);
 			
-			prevID = cyclist['iso_id'];
+			prevID = cyclist['country_name'];
 		}
 		
 		var newCell = $("<td>");
@@ -357,7 +353,7 @@ $(document).ready(function() {
   <tr>
   <td>
 <div class="fixed">~  __0
- _-\<,_
+ _-\&lt;,_
 (*)/ (*)
 </div>
   </td>
@@ -373,10 +369,10 @@ $(document).ready(function() {
         <th><label for="country4">Country 4</label></th>
       </tr>
       <tr>
-        <td><input name="country1" type="text" class="larger" id="country1" size="5"></td>
-        <td><input name="country2" type="text" class="larger" id="country2" size="5"></td>
-        <td><input name="country3" type="text" class="larger" id="country3" size="5"></td>
-        <td><input name="country4" type="text" class="larger" id="country4" size="5"></td>
+        <td><input name="country1" type="text" class="fixedwidth larger" id="country1"></td>
+        <td><input name="country2" type="text" class="fixedwidth larger" id="country2"></td>
+        <td><input name="country3" type="text" class="fixedwidth larger" id="country3"></td>
+        <td><input name="country4" type="text" class="fixedwidth larger" id="country4"></td>
       </tr>
     </table>
   </form>
