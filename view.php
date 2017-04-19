@@ -4,9 +4,12 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="robots" content="noindex, nofollow" />
 <link rel="stylesheet" type="text/css" href="style.css">
+<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
 <script>
 var displayedData = {};
+var countryList = [];
 
 function getCookie(cname)
 {
@@ -74,16 +77,15 @@ function loadCookies()
 	}
 }
 
-function isValidISOFormat(value)
+function isValidISO(value)
 {
-	var exp = new RegExp("^[A-Za-z]{3}$");
-	return exp.test(value);
+	return (countryList.indexOf(value) != -1);
 }
 
 function updateColumnVisibility()
 {
-	var twoValid = (isValidISOFormat($("#country1").val()) && isValidISOFormat($("#country2").val()) || isValidISOFormat($("#country3").val()));
-	var threeValid = (twoValid && isValidISOFormat($("#country3").val())) || isValidISOFormat($("#country4").val());
+	var twoValid = (isValidISO($("#country1").val()) && isValidISO($("#country2").val()) || isValidISO($("#country3").val()));
+	var threeValid = (twoValid && isValidISO($("#country3").val())) || isValidISO($("#country4").val());
 	
 	$("#inputtable th:nth-child(3), #inputtable td:nth-child(3)").css("display", (twoValid ? "" : "none"));
 	$("#inputtable th:nth-child(4), #inputtable td:nth-child(4)").css("display", (threeValid ? "" : "none"));
@@ -98,37 +100,35 @@ function updateResults()
 	var c3 = $("#country3").val();
 	var c4 = $("#country4").val();
 	
-	var data = new Object();
+	var data = {};
 	
-	if (isValidISOFormat(c1))
+	if (isValidISO(c1))
 	{
 		data.country1 = c1;
 	}
 	
-	if (isValidISOFormat(c2))
+	if (isValidISO(c2))
 	{
 		data.country2 = c2;
 	}
 	
-	if (isValidISOFormat(c3))
+	if (isValidISO(c3))
 	{
 		data.country3 = c3;
 	}
 	
-	if (isValidISOFormat(c4))
+	if (isValidISO(c4))
 	{
 		data.country4 = c4;
 	}
 	
 	var numValid = Object.keys(data).length;
 	
-	if (numValid >= 2 && displayedData != data)
-	{		
+	if (numValid >= 2 && JSON.stringify(displayedData) !== JSON.stringify(data))
+	{
 		displayedData = data;
 		
 		$.get("table.php", data, function(json) {
-			console.log("JSON result recieved: ");
-			console.log(json);
 			updateComparisonTable(json['countries']);
 			updateCyclistsTable(json['cyclists']);
 		}, "json");
@@ -318,6 +318,28 @@ function updateCyclistsTable(json)
 }
 
 $(document).ready(function() {
+	$.get("countrylist.php", function(json) {		
+		countryList = $.map(json, function(el) { return el['iso_id']; });
+		
+		acobj = {
+			source: function(request, response) {
+				var matcher = new RegExp( "^" + $.ui.autocomplete.escapeRegex(request.term), "i");
+				response($.grep(countryList, function(item) {
+					return matcher.test(item);
+				}));
+			},
+			minLength: 1,
+			close: function(event, ui) { updateResults(); }
+		};
+		
+		$("#country1").autocomplete(acobj);
+		$("#country2").autocomplete(acobj);
+		$("#country3").autocomplete(acobj);
+		$("#country4").autocomplete(acobj);
+		
+		updateResults();
+	}, "json");
+	
 	$("#country1").on("input", function() {
 		updateResults();
 	});
@@ -336,11 +358,9 @@ $(document).ready(function() {
 	
 	$(window).on("beforeunload", function() {
 		updateCookies();
-	});
+	});	
 	
 	loadCookies();
-	
-	updateResults();
 });
 </script>
 <title>Country Comparison</title>

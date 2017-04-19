@@ -24,3 +24,8 @@ table {
 .fixedwidth {
 	width: 120px;
 }
+.ui-autocomplete {
+    max-height: 225px;
+    overflow-y: auto;
+    overflow-x: hidden;
+ }
