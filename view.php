@@ -185,6 +185,13 @@ function updateComparisonTable(json)
 	
 	var highestIndexes = [];
 	
+	for (var r = 0; r < json.length; r++)
+	{
+		var country = json[r];
+		country['gdp per capita'] = country['gdp']/country['population'];
+		console.log(country['gdp per capita']);
+	}
+	
 	for (var prop in json[0])
 	{		
 		var highest = -1;
