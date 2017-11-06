@@ -10,7 +10,7 @@ $dsn = "mysql://$username:$password@$host/$db_name";
 
 $db = &MDB2::connect($dsn);
 
-if(PEAR::isError($db))
+if (PEAR::isError($db))
 { 
     die($db->getMessage());
 }
@@ -27,7 +27,7 @@ $db->setFetchMode(MDB2_FETCHMODE_ASSOC);
 
 $res = &$db->query($sql);
 
-if(PEAR::isError($res))
+if (PEAR::isError($res))
 {
     die($res->getMessage());
 }

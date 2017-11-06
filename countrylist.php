@@ -12,7 +12,7 @@ $db = &MDB2::connect($dsn);
 
 $db->setFetchMode(MDB2_FETCHMODE_ASSOC);
 
-if(PEAR::isError($db))
+if (PEAR::isError($db))
 {
     die($db->getMessage());
 }

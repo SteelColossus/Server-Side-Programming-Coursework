@@ -12,7 +12,7 @@ $db = &MDB2::connect($dsn);
 
 $db->setFetchMode(MDB2_FETCHMODE_ASSOC);
 
-if(PEAR::isError($db))
+if (PEAR::isError($db))
 {
     die($db->getMessage());
 }
@@ -37,54 +37,54 @@ $sql_full = "";
 $i = 0;
 
 foreach ($countries as $c)
-{	
-	$sql_full .= ($sql_base . " \"");
-	$sql_full .= $c;
-	$sql_full .= "\"";
-	if (++$i < count($countries)) $sql_full .= " UNION ";
+{    
+    $sql_full .= ($sql_base . " \"");
+    $sql_full .= $c;
+    $sql_full .= "\"";
+    if (++$i < count($countries)) $sql_full .= " UNION ";
 }
 
 $res = &$db->query($sql_full);
 
-if(PEAR::isError($res))
+if (PEAR::isError($res))
 {
-	die($res->getMessage());
+    die($res->getMessage());
 }
 
 if ($res->numRows() > 1)
 {
-	$compdata = &$res->fetchAll();
-	
-	$sql_base = "SELECT Country.ISO_id, Cyclist.name, Country.country_name FROM Cyclist INNER JOIN Country ON Cyclist.ISO_id = Country.ISO_id WHERE Cyclist.ISO_id LIKE";
-	$sql_full = "";
+    $compdata = &$res->fetchAll();
 
-	$i = 0;
+    $sql_base = "SELECT Country.ISO_id, Cyclist.name, Country.country_name FROM Cyclist INNER JOIN Country ON Cyclist.ISO_id = Country.ISO_id WHERE Cyclist.ISO_id LIKE";
+    $sql_full = "";
 
-	foreach ($countries as $c)
-	{	
-		$sql_full .= ($sql_base . " \"");
-		$sql_full .= $c;
-		$sql_full .= "\"";
-		
-		if (++$i < count($countries))
-		{
-			$sql_full .= " UNION ";
-		}
-		else
-		{
-			$sql_full = "SELECT name, country_name FROM (" . $sql_full;
-			$sql_full .= " ORDER BY ISO_id, name) results";
-		}
-	}
-	
-	$res = &$db->query($sql_full);
+    $i = 0;
 
-	if(PEAR::isError($res))
-	{
-		die($res->getMessage());
-	}
-	
-	$cycdata = &$res->fetchAll();
-	echo json_encode(array("countries" => $compdata, "cyclists" => $cycdata));
+    foreach ($countries as $c)
+    {    
+        $sql_full .= ($sql_base . " \"");
+        $sql_full .= $c;
+        $sql_full .= "\"";
+
+        if (++$i < count($countries))
+        {
+            $sql_full .= " UNION ";
+        }
+        else
+        {
+            $sql_full = "SELECT name, country_name FROM (" . $sql_full;
+            $sql_full .= " ORDER BY ISO_id, name) results";
+        }
+    }
+
+    $res = &$db->query($sql_full);
+
+    if (PEAR::isError($res))
+    {
+        die($res->getMessage());
+    }
+    
+    $cycdata = &$res->fetchAll();
+    echo json_encode(array("countries" => $compdata, "cyclists" => $cycdata));
 }
 ?>
